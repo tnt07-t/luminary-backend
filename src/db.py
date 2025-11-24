@@ -79,7 +79,7 @@ class Constellation_Attempt(db.Model):
     __tablename__ = "constellation_attempts"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
-    constellation_id = db.Column(db.Integer, db.ForeignKey("constellations.id"), nullable = False)
+    constellation_id = db.Column(db.Integer, db.ForeignKey("constellations.constellation_id"), nullable = False)
     stars_completed = db.Column(db.Integer, nullable = False)
     #est. relationships
     user = db.relationship("User", back_populates = "constellation_attempts")
@@ -88,9 +88,9 @@ class Constellation_Attempt(db.Model):
         """
         Initialize Constellation_Attempt object
         """
-        user_id = kwargs.get("user_id")
-        constellation_id = kwargs.get("constellation_id")
-        stars_completed = 0
+        self.user_id = kwargs.get("user_id")
+        self.constellation_id = kwargs.get("constellation_id")
+        self.stars_completed = 0
 
     def serialize(self):
         """
@@ -111,8 +111,8 @@ class Session(db.Model):
     __tablename__ = 'sessions'
 
     session_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    constellation_attempt_id = db.Column(db.Integer, db.ForeignKey('constellation_attempts.attempt_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    constellation_attempt_id = db.Column(db.Integer, db.ForeignKey('constellation_attempts.id'), nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
     hours = db.Column(db.Integer, nullable=False)
     #est. relationship
@@ -146,7 +146,7 @@ class Post(db.Model):
     __tablename__ = 'posts'
 
     post_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     constellation_id = db.Column(db.Integer, db.ForeignKey('constellations.constellation_id'), nullable=False)
     post_type = db.Column(db.String(50), nullable=False)
 
