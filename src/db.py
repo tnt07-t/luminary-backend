@@ -13,10 +13,13 @@ class User(db):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     display_name = db.Column(db.String, nullable = False)
+    current_attempt_id = db.Column(db.Integer, db.ForeignKey("constellation_attempts.id"), nullable=True)
     #est. relationships
     constellation_attempts = db.relationship("Constellation_Attempts", back_populates = "user", cascade = "delete")
     sessions = db.relationship("Session", back_populates = "user",cascade = "delete")
     posts = db.relationship("Post", back_populates="user", cascade="delete")
+    
+
 
     def __init__(self, **kwargs):
         """
@@ -82,9 +85,12 @@ class Constellation_Attempt(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
     constellation_id = db.Column(db.Integer, db.ForeignKey("constellations.constellation_id"), nullable = False)
     stars_completed = db.Column(db.Integer, nullable = False)
+    
     #est. relationships
     user = db.relationship("User", back_populates = "constellation_attempts")
-    
+    constellation = db.relationship("Constellation", back_populates="user_attempts")
+    sessions = db.relationship("Session", back_populates="constellation_attempt", cascade="delete")
+
     def __init__(self, **kwargs):
         """
         Initialize Constellation_Attempt object
@@ -115,9 +121,10 @@ class Session(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     constellation_attempt_id = db.Column(db.Integer, db.ForeignKey('constellation_attempts.id'), nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
-    hours = db.Column(db.Integer, nullable=False)
+    minutes = db.Column(db.Integer, nullable=False)
     #est. relationship
     user = db.relationship("User", back_populates = "sessions")
+    constellation_attempt = db.relationship("Constellation_Attempt", back_populates="sessions")
 
     def __init__(self, **kwargs):
         """
@@ -150,6 +157,10 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     constellation_id = db.Column(db.Integer, db.ForeignKey('constellations.constellation_id'), nullable=False)
     post_type = db.Column(db.String(50), nullable=False)
+
+    #establish relationships
+    user = db.relationship("User", back_populates="posts")
+    constellation = db.relationship("Constellation", back_populates="posts")
 
     def __init__(self, **kwargs):
         """
