@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 
 #Database Model Classes
-class User():
+class User(db):
     """
     User model
     One-to-many relationship with Constellations_attempts
@@ -37,8 +37,46 @@ class User():
             "display_name" : self.display_name
         }
 
+class Constellation(db.Model):
+    """
+    Constellation model
+    One-to-many relationship with Constellation_Attempts
+    """
+    __tablename__ = 'constellations'
 
-class Constellation_Attempts(self):
+    constellation_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    weight = db.Column(db.Integer, nullable=False)
+
+    def init(self, **kwargs):
+        """
+        Initialize Constellation object
+        """
+        self.name = kwargs.get('name')
+        self.weight = kwargs.get('weight')
+
+
+
+class Constellation_Attempts(db.Model):
     """
     Constellation_Attempts model
     """
+
+
+class Session(db.Model):
+    __tablename__ = 'sessions'
+
+    session_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    constellation_attempt_id = db.Column(db.Integer, db.ForeignKey('constellation_attempts.attempt_id'), nullable=False)
+    is_completed = db.Column(db.Boolean, default=False)
+    hours = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, **kwargs):
+        """
+        Initialize Session object
+        """
+        self.user_id = kwargs.get('user_id')
+        self.constellation_attempt_id = kwargs.get('constellation_attempt_id')
+        self.is_completed = kwargs.get('is_completed', False)
+        self.hours = kwargs.get('hours')
