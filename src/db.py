@@ -72,9 +72,9 @@ class Constellation(db.Model):
 
 
 
-class Constellation_Attempts(db.Model):
+class Constellation_Attempt(db.Model):
     """
-    Constellation_Attempts model
+    Constellation_Attempt model
     """
     __tablename__ = "constellation_attempts"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
@@ -84,6 +84,13 @@ class Constellation_Attempts(db.Model):
     #est. relationships
     user = db.relationship("User", back_populates = "constellation_attempts")
     
+    def __init__(self, **kwargs):
+        """
+        Initialize Constellation_Attempt object
+        """
+        user_id = kwargs.get("user_id")
+        constellation_id = kwargs.get("constellation_id")
+        stars_completed = 0
 
 class Session(db.Model):
     """
