@@ -93,6 +93,18 @@ class Constellation_Attempt(db.Model):
         constellation_id = kwargs.get("constellation_id")
         stars_completed = 0
 
+    def serialize(self):
+        """
+        Serialize a Constellation_Attempt Object
+        """
+        return {
+            "id" : self.id,
+            "user_id" : self.user_id,
+            "constellation_id" : self.constellation_id,
+            "stars_completed" : self.stars_completed
+        }
+    
+
 class Session(db.Model):
     """
     Session model
@@ -115,6 +127,18 @@ class Session(db.Model):
         self.constellation_attempt_id = kwargs.get('constellation_attempt_id')
         self.is_completed = kwargs.get('is_completed', False)
         self.hours = kwargs.get('hours')
+        
+    def serialize(self):
+        """
+        Serialize a Session Object
+        """
+        return {
+            "session_id": self.session_id,
+            "user_id": self.user_id,
+            "constellation_attempt_id": self.constellation_attempt_id,
+            "is_completed": self.is_completed,
+            "hours": self.hours
+        }
 
 class Post(db.Model):
     """
