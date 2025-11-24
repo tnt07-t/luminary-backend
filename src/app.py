@@ -24,6 +24,22 @@ def failure_response(message, code=404):
     return json.dumps({"error": message}), code
 
 
+#------USER ROUTES-----------------------------------------------------------------------
+@app.route("/api/users/", methods = ["POST"])
+def create_user():
+    """
+    Endpoint for creating a user
+    """
+    body = json.loads(request.data)
+    display_name = body.get("display_name")
+    if display_name is None:
+        return failure_response("Display_name is missing", 400)
+    new_user = User(display_name = display_name)
+    db.session.add(new_user)
+    db.session.commit()
+    return success_response(new_user.serialize(), 201)
+
+
 
 
 
