@@ -61,7 +61,12 @@ class Constellation_Attempts(db.Model):
     """
     Constellation_Attempts model
     """
-
+    __tablename__ = "constellation_attempts"
+    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
+    constellation_id = db.Column(db.Integer, db.ForeignKey("constellations.id"), nullable = False)
+    stars_completed = db.Column(db.Integer, nullable = False)
+    
 
 class Session(db.Model):
     """
