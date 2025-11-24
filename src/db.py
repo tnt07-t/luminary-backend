@@ -50,6 +50,7 @@ class Constellation(db.Model):
     constellation_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     weight = db.Column(db.Integer, nullable=False)
+    #establish relationship
     user_attempts = db.relationship("Constellation_Attempts", back_populates="constellation")
 
 
