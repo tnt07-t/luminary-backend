@@ -8,13 +8,13 @@ db = SQLAlchemy()
 class User(db):
     """
     User model
-    One-to-many relationship with Constellations_attempts
+    One-to-many relationship with Constellation_Attempts
     One-to-many relationship with Study_sessions
     """
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     display_name = db.Column(db.String, nullable = False)
-
+    posts = db.relationship("Post", back_populates="user", cascade="delete")
 
     def __init__(self, **kwargs):
         """
@@ -28,7 +28,8 @@ class User(db):
         """
         return {
             "id" : self.id,
-            "display_name" : self.display_name
+            "display_name" : self.display_name,
+            "posts": [post.simple_serialize() for post in self.posts]
         }
     
     def simple_serialize(self):
@@ -47,6 +48,8 @@ class Constellation(db.Model):
     constellation_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     weight = db.Column(db.Integer, nullable=False)
+    user_attempts = db.relationship("Constellation_Attempts", back_populates="constellation")
+
 
     def init(self, **kwargs):
         """
@@ -54,6 +57,16 @@ class Constellation(db.Model):
         """
         self.name = kwargs.get('name')
         self.weight = kwargs.get('weight')
+
+    def serialize(self):
+        """
+        Serialize a Constellation Object
+        """
+        return {
+            "constellation_id": self.constellation_id,
+            "name": self.name,
+            "weight": self.weight
+        }
 
 
 
@@ -89,9 +102,9 @@ class Session(db.Model):
         self.is_completed = kwargs.get('is_completed', False)
         self.hours = kwargs.get('hours')
 
-class Posts(db.Model):
+class Post(db.Model):
     """
-    Posts model
+    Post model
     """
     __tablename__ = 'posts'
 
@@ -107,3 +120,20 @@ class Posts(db.Model):
         self.user_id = kwargs.get('user_id')
         self.constellation_id = kwargs.get('constellation_id')
         self.post_type = kwargs.get('post_type')
+
+    def serialize(self):
+        """
+        Serialize a Post Object
+        """
+        return {
+            "post_id": self.post_id,
+            "user_id": self.user_id,
+            "constellation_id": self.constellation_id,
+            "post_type": self.post_type
+        }
+    
+    def simple_serialize(self):
+        return {
+            "post_id": self.post_id,
+            "post_type": self.post_type
+        }
