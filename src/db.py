@@ -64,6 +64,9 @@ class Constellation_Attempts(db.Model):
 
 
 class Session(db.Model):
+    """
+    Session model
+    """
     __tablename__ = 'sessions'
 
     session_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -80,3 +83,22 @@ class Session(db.Model):
         self.constellation_attempt_id = kwargs.get('constellation_attempt_id')
         self.is_completed = kwargs.get('is_completed', False)
         self.hours = kwargs.get('hours')
+
+class Posts(db.Model):
+    """
+    Posts model
+    """
+    __tablename__ = 'posts'
+
+    post_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    constellation_id = db.Column(db.Integer, db.ForeignKey('constellations.constellation_id'), nullable=False)
+    post_type = db.Column(db.String(50), nullable=False)
+
+    def __init__(self, **kwargs):
+        """
+        Initialize Posts object
+        """
+        self.user_id = kwargs.get('user_id')
+        self.constellation_id = kwargs.get('constellation_id')
+        self.post_type = kwargs.get('post_type')
