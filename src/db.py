@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-
 #Database Model Classes
 class User(db):
     """
@@ -14,7 +13,9 @@ class User(db):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     display_name = db.Column(db.String, nullable = False)
-
+    #est. relationships
+    constellation_attempts = db.relationship("Constellation_Attempts", back_populates = "user", cascade = "delete")
+    sessions = db.relationship("Session", back_populates = "user",cascade = "delete")
 
     def __init__(self, **kwargs):
         """
@@ -66,6 +67,8 @@ class Constellation_Attempts(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
     constellation_id = db.Column(db.Integer, db.ForeignKey("constellations.id"), nullable = False)
     stars_completed = db.Column(db.Integer, nullable = False)
+    #est. relationships
+    user = db.relationship("User", back_populates = "constellation_attempts")
     
 
 class Session(db.Model):
@@ -79,6 +82,8 @@ class Session(db.Model):
     constellation_attempt_id = db.Column(db.Integer, db.ForeignKey('constellation_attempts.attempt_id'), nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
     hours = db.Column(db.Integer, nullable=False)
+    #est. relationship
+    user = db.relationship("User", back_populates = "sessions")
 
     def __init__(self, **kwargs):
         """
