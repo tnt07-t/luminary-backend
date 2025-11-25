@@ -7,7 +7,7 @@ db = SQLAlchemy()
 class User(db):
     """
     User model
-    One-to-many relationship with Constellation_Attempts
+    One-to-many relationship with Constellation_Attempt
     One-to-many relationship with Study_sessions
     """
     __tablename__ = "users"
@@ -15,7 +15,7 @@ class User(db):
     display_name = db.Column(db.String, nullable = False)
     current_attempt_id = db.Column(db.Integer, db.ForeignKey("constellation_attempts.id"), nullable=True)
     #est. relationships
-    constellation_attempts = db.relationship("Constellation_Attempts", back_populates = "user", cascade = "delete")
+    constellation_attempts = db.relationship("Constellation_Attempt", back_populates = "user", cascade = "delete")
     sessions = db.relationship("Session", back_populates = "user",cascade = "delete")
     posts = db.relationship("Post", back_populates="user", cascade="delete")
     
@@ -46,7 +46,7 @@ class User(db):
 class Constellation(db.Model):
     """
     Constellation model
-    One-to-many relationship with Constellation_Attempts
+    One-to-many relationship with Constellation_Attempt
     """
     __tablename__ = 'constellations'
 
@@ -54,7 +54,7 @@ class Constellation(db.Model):
     name = db.Column(db.String(100), nullable=False)
     weight = db.Column(db.Integer, nullable=False)
     #establish relationship
-    user_attempts = db.relationship("Constellation_Attempts", back_populates="constellation")
+    user_attempts = db.relationship("Constellation_Attempt", back_populates="constellation")
 
 
     def init(self, **kwargs):
