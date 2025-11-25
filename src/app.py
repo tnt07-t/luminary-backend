@@ -1,6 +1,6 @@
 import json
 
-from db import Course, Assignment, User , db
+from db import User, Constellation, Constellation_Attempt, Post, db
 from flask import Flask, request
 
 app = Flask(__name__)
