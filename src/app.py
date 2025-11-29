@@ -39,7 +39,23 @@ def create_user():
     db.session.commit()
     return success_response(new_user.serialize(), 201)
 
+@app.route("/api/users/")
+def get_users():
+    """
+    Endpoint for getting all users
+    """
+    users = [user.serialize() for user in User.query.all()]
+    return success_response({"users": users}, 200)
 
+@app.route("/api/users/<int:user_id>/")
+def get_user_by_id(user_id):
+    """
+    Endpoint for getting user by user_id
+    """
+    user = User.query.filter_by(id = user_id).first()
+    if user is None:
+        return failure_response("User not found!", 404)
+    return success_response(user.serialize(), 200)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

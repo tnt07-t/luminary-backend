@@ -4,7 +4,7 @@ db = SQLAlchemy()
 
 
 #Database Model Classes
-class User(db):
+class User(db.Model):
     """
     User model
     One-to-many relationship with Constellation_Attempt
@@ -15,7 +15,8 @@ class User(db):
     display_name = db.Column(db.String, nullable = False)
     current_attempt_id = db.Column(db.Integer, db.ForeignKey("constellation_attempts.id"), nullable=True)
     #est. relationships
-    constellation_attempts = db.relationship("Constellation_Attempt", back_populates = "user", cascade = "delete")
+    constellation_attempts = db.relationship("Constellation_Attempt", foreign_keys="Constellation_Attempt.user_id", back_populates = "user", cascade = "delete")
+    current_attempt = db.relationship("Constellation_Attempt", foreign_keys=[current_attempt_id], uselist=False)
     sessions = db.relationship("Session", back_populates = "user",cascade = "delete")
     posts = db.relationship("Post", back_populates="user", cascade="delete")
     
@@ -50,14 +51,14 @@ class Constellation(db.Model):
     """
     __tablename__ = 'constellations'
 
-    constellation_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     weight = db.Column(db.Integer, nullable=False)
     #establish relationship
     user_attempts = db.relationship("Constellation_Attempt", back_populates="constellation")
+    posts = db.relationship("Post", back_populates="constellation")
 
-
-    def init(self, **kwargs):
+    def __init__(self, **kwargs):
         """
         Initialize Constellation object
         """
@@ -69,7 +70,7 @@ class Constellation(db.Model):
         Serialize a Constellation Object
         """
         return {
-            "constellation_id": self.constellation_id,
+            "id": self.id,
             "name": self.name,
             "weight": self.weight
         }
@@ -83,11 +84,11 @@ class Constellation_Attempt(db.Model):
     __tablename__ = "constellation_attempts"
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
-    constellation_id = db.Column(db.Integer, db.ForeignKey("constellations.constellation_id"), nullable = False)
+    constellation_id = db.Column(db.Integer, db.ForeignKey("constellations.id"), nullable = False)
     stars_completed = db.Column(db.Integer, nullable = False)
     
     #est. relationships
-    user = db.relationship("User", back_populates = "constellation_attempts")
+    user = db.relationship("User", foreign_keys=[user_id], back_populates = "constellation_attempts")
     constellation = db.relationship("Constellation", back_populates="user_attempts")
     sessions = db.relationship("Session", back_populates="constellation_attempt", cascade="delete")
 
@@ -117,11 +118,11 @@ class Session(db.Model):
     """
     __tablename__ = 'sessions'
 
-    session_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     constellation_attempt_id = db.Column(db.Integer, db.ForeignKey('constellation_attempts.id'), nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
-    minutes = db.Column(db.Integer, nullable=False)
+    hours = db.Column(db.Integer, nullable=False)
     #est. relationship
     user = db.relationship("User", back_populates = "sessions")
     constellation_attempt = db.relationship("Constellation_Attempt", back_populates="sessions")
@@ -140,7 +141,7 @@ class Session(db.Model):
         Serialize a Session Object
         """
         return {
-            "session_id": self.session_id,
+            "id": self.id,
             "user_id": self.user_id,
             "constellation_attempt_id": self.constellation_attempt_id,
             "is_completed": self.is_completed,
@@ -153,9 +154,9 @@ class Post(db.Model):
     """
     __tablename__ = 'posts'
 
-    post_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    constellation_id = db.Column(db.Integer, db.ForeignKey('constellations.constellation_id'), nullable=False)
+    constellation_id = db.Column(db.Integer, db.ForeignKey('constellations.id'), nullable=False)
     post_type = db.Column(db.String(50), nullable=False)
 
     #establish relationships
@@ -175,7 +176,7 @@ class Post(db.Model):
         Serialize a Post Object
         """
         return {
-            "post_id": self.post_id,
+            "id": self.id,
             "user_id": self.user_id,
             "constellation_id": self.constellation_id,
             "post_type": self.post_type
@@ -183,6 +184,6 @@ class Post(db.Model):
     
     def simple_serialize(self):
         return {
-            "post_id": self.post_id,
+            "id": self.id,
             "post_type": self.post_type
         }
