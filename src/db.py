@@ -20,8 +20,6 @@ class User(db.Model):
     sessions = db.relationship("Session", back_populates = "user",cascade = "delete")
     posts = db.relationship("Post", back_populates="user", cascade="delete")
     
-
-
     def __init__(self, **kwargs):
         """
         Initialize Course object
@@ -30,18 +28,25 @@ class User(db.Model):
 
     def serialize(self):
         """
-        Serialize a User Object
+        Serialize a User Object with all relationships
         """
         return {
-            "id" : self.id,
-            "display_name" : self.display_name,
+            "id": self.id,
+            "display_name": self.display_name,
+            "current_attempt_id": self.current_attempt_id,
+            "current_attempt": self.current_attempt.simple_serialize() if self.current_attempt else None,
+            "constellation_attempts": [attempt.simple_serialize() for attempt in self.constellation_attempts],
+            "sessions": [session.simple_serialize() for session in self.sessions],
             "posts": [post.simple_serialize() for post in self.posts]
         }
     
     def simple_serialize(self):
+        """
+        Simple User serialization to prevent loops
+        """
         return {
-            "id" : self.id,
-            "display_name" : self.display_name
+            "id": self.id,
+            "display_name": self.display_name
         }
 
 class Constellation(db.Model):
@@ -67,7 +72,19 @@ class Constellation(db.Model):
 
     def serialize(self):
         """
-        Serialize a Constellation Object
+        Serialize a Constellation Object with all relationships
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "weight": self.weight,
+            "user_attempts": [attempt.simple_serialize() for attempt in self.user_attempts],
+            "posts": [post.simple_serialize() for post in self.posts]
+        }
+
+    def simple_serialize(self):
+        """
+        Simple Constellation serialization to prevent loops
         """
         return {
             "id": self.id,
@@ -102,13 +119,27 @@ class Constellation_Attempt(db.Model):
 
     def serialize(self):
         """
-        Serialize a Constellation_Attempt Object
+        Serialize a Constellation_Attempt Object with all relationships
         """
         return {
-            "id" : self.id,
-            "user_id" : self.user_id,
-            "constellation_id" : self.constellation_id,
-            "stars_completed" : self.stars_completed
+            "id": self.id,
+            "user_id": self.user_id,
+            "constellation_id": self.constellation_id,
+            "stars_completed": self.stars_completed,
+            "user": self.user.simple_serialize() if self.user else None,
+            "constellation": self.constellation.simple_serialize() if self.constellation else None,
+            "sessions": [session.simple_serialize() for session in self.sessions]
+        }
+
+    def simple_serialize(self):
+        """
+        Simple Constellation_Attempt serialization to prevent loops
+        """
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "constellation_id": self.constellation_id,
+            "stars_completed": self.stars_completed
         }
     
 
@@ -138,7 +169,21 @@ class Session(db.Model):
         
     def serialize(self):
         """
-        Serialize a Session Object
+        Serialize a Session Object with all relationships
+        """
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "constellation_attempt_id": self.constellation_attempt_id,
+            "is_completed": self.is_completed,
+            "hours": self.hours,
+            "user": self.user.simple_serialize() if self.user else None,
+            "constellation_attempt": self.constellation_attempt.simple_serialize() if self.constellation_attempt else None
+        }
+
+    def simple_serialize(self):
+        """
+        Simple Session serialization to prevent loops
         """
         return {
             "id": self.id,
@@ -158,6 +203,7 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     constellation_id = db.Column(db.Integer, db.ForeignKey('constellations.id'), nullable=False)
     post_type = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     #establish relationships
     user = db.relationship("User", back_populates="posts")
@@ -173,17 +219,24 @@ class Post(db.Model):
 
     def serialize(self):
         """
-        Serialize a Post Object
+        Serialize a Post Object with all relationships
         """
         return {
             "id": self.id,
             "user_id": self.user_id,
             "constellation_id": self.constellation_id,
-            "post_type": self.post_type
+            "post_type": self.post_type,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "user": self.user.simple_serialize() if self.user else None,
+            "constellation": self.constellation.simple_serialize() if self.constellation else None
         }
     
     def simple_serialize(self):
+        """
+        Simple Post serialization to prevent loops
+        """
         return {
             "id": self.id,
-            "post_type": self.post_type
+            "post_type": self.post_type,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
