@@ -594,7 +594,6 @@ Complete API documentation with request/response examples for the Luminary Backe
 **Note:** `post_type` must be either:
 - `"completion"` - when a constellation is fully completed
 - `"progress"` - when a session/star is completed
-```
 
 **Response (201):**
 ```json
