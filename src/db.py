@@ -162,7 +162,7 @@ class Session(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     constellation_attempt_id = db.Column(db.Integer, db.ForeignKey('constellation_attempts.id'), nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
-    hours = db.Column(db.Integer, nullable=False)
+    minutes = db.Column(db.Integer, nullable=False)
     #est. relationship
     user = db.relationship("User", back_populates = "sessions")
     constellation_attempt = db.relationship("Constellation_Attempt", back_populates="sessions")
@@ -174,7 +174,7 @@ class Session(db.Model):
         self.user_id = kwargs.get('user_id')
         self.constellation_attempt_id = kwargs.get('constellation_attempt_id')
         self.is_completed = kwargs.get('is_completed', False)
-        self.hours = kwargs.get('hours')
+        self.minutes = kwargs.get('minutes')
         
     def serialize(self):
         """
@@ -185,7 +185,7 @@ class Session(db.Model):
             "user_id": self.user_id,
             "constellation_attempt_id": self.constellation_attempt_id,
             "is_completed": self.is_completed,
-            "hours": self.hours,
+            "minutes": self.minutes,
             "user": self.user.simple_serialize() if self.user else None,
             "constellation_attempt": self.constellation_attempt.simple_serialize() if self.constellation_attempt else None
         }
@@ -199,7 +199,7 @@ class Session(db.Model):
             "user_id": self.user_id,
             "constellation_attempt_id": self.constellation_attempt_id,
             "is_completed": self.is_completed,
-            "hours": self.hours
+            "minutes": self.minutes
         }
 
 class Post(db.Model):
