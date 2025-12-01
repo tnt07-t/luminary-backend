@@ -591,6 +591,11 @@ Complete API documentation with request/response examples for the Luminary Backe
 }
 ```
 
+**Note:** `post_type` must be either:
+- `"completion"` - when a constellation is fully completed
+- `"progress"` - when a session/star is completed
+```
+
 **Response (201):**
 ```json
 {
@@ -736,7 +741,7 @@ Complete API documentation with request/response examples for the Luminary Backe
             "id": 2,
             "user_id": 1,
             "constellation_id": 1,
-            "post_type": "milestone",
+            "post_type": "progress",
             "created_at": "2025-12-01T14:22:00",
             "user": {
                 "id": 1,
@@ -791,6 +796,8 @@ All error responses follow this format:
 - All timestamps are in ISO 8601 format
 - All IDs are integers starting from 1
 - Minutes are tracked as integers
-- Post types can be any string (e.g., "completion", "milestone", "progress")
+- Post types:
+  - `"completion"` - when a constellation is fully completed
+  - `"progress"` - when a session/star is completed
 - Sessions default to `is_completed: false` when created
 - Constellation attempts start with `stars_completed: 0`
