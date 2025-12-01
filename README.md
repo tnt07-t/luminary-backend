@@ -1,6 +1,6 @@
 # Luminary Backend
 
-A comprehensive backend API for a study application built with Python, Flask, and SQLAlchemy. This application helps users track their learning progress through constellations (study topics), attempts, sessions, and posts them after completing every constellation.
+Backend API for a study application built with Python, Flask, and SQLAlchemy. This application helps users track their learning progress through constellations (study topics), attempts, sessions, and posts them after completing every constellation.
 
 
 ## Database Schema
@@ -200,6 +200,8 @@ All error responses follow this format:
 ```json
 {
     "error": "error_message",
-    "status_code": 400 // or 404
+    "status_code": 400 or 404
 }
 ```
+
+Created by Olric Zeng and Tran Tran
