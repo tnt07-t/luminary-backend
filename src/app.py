@@ -58,9 +58,147 @@ def get_user_by_id(user_id):
         return failure_response("User not found!", 404)
     return success_response(user.serialize(), 200)
 
+@app.route("/api/users/<int:user_id>/total_hours/")
+def get_user_total_hours(user_id):
+    """
+    Endpoint for getting total hours a user has worked (only completed sessions)
+    """
+    user = User.query.filter_by(id = user_id).first()
+    if user is None:
+        return failure_response("User not found!", 404)
+
+    total_hours = 0
+    for session in user.sessions:
+        if session.is_completed and session.hours:
+            total_hours += session.hours
+
+    return success_response({
+        "user_id": user_id,
+        "display_name": user.display_name,
+        "total_hours": total_hours
+    }, 200)
+
+
+#------CONSTELLATION ROUTES-------------------------------------------------------------
+@app.route("/api/constellations/", methods=["POST"])
+def create_constellation():
+    """
+    Endpoint for creating a constellation
+    """
+    body = json.loads(request.data)
+    name = body.get("name")
+    weight = body.get("weight")
+
+    if name is None or weight is None:
+        return failure_response("Missing name or weight!", 400)
+
+    new_constellation = Constellation(name=name, weight=weight)
+    db.session.add(new_constellation)
+    db.session.commit()
+    return success_response(new_constellation.serialize(), 201)
+
+@app.route("/api/constellations/")
+def get_constellations():
+    """
+    Endpoint for getting all constellations
+    """
+    constellations = [c.serialize() for c in Constellation.query.all()]
+    return success_response({"constellations": constellations}, 200)
+
+@app.route("/api/constellations/<int:constellation_id>/")
+def get_constellation_by_id(constellation_id):
+    """
+    Endpoint for getting constellation by id
+    """
+    constellation = Constellation.query.filter_by(id=constellation_id).first()
+    if constellation is None:
+        return failure_response("Constellation not found!", 404)
+    return success_response(constellation.serialize(), 200)
+
+@app.route("/api/constellations/<int:constellation_id>/", methods=["PUT"])
+def update_constellation(constellation_id):
+    """
+    Endpoint for updating a constellation
+    """
+    constellation = Constellation.query.filter_by(id=constellation_id).first()
+    if constellation is None:
+        return failure_response("Constellation not found!", 404)
+
+    body = json.loads(request.data)
+    constellation.name = body.get("name", constellation.name)
+    constellation.weight = body.get("weight", constellation.weight)
+    db.session.commit()
+    return success_response(constellation.serialize(), 200)
+
+@app.route("/api/constellations/<int:constellation_id>/", methods=["DELETE"])
+def delete_constellation(constellation_id):
+    """
+    Endpoint for deleting a constellation
+    """
+    constellation = Constellation.query.filter_by(id=constellation_id).first()
+    if constellation is None:
+        return failure_response("Constellation not found!", 404)
+    db.session.delete(constellation)
+    db.session.commit()
+    return success_response({"message": "Constellation deleted successfully!"}, 200)
 
 
 #------CONSTELLATION ATTEMPT ROUTES-----------------------------------------------------
+@app.route("/api/users/<int:user_id>/constellation_attempts/", methods=["POST"])
+def create_constellation_attempt(user_id):
+    """
+    Endpoint for creating a constellation attempt for a user
+    """
+    body = json.loads(request.data)
+    constellation_id = body.get("constellation_id")
+
+    if constellation_id is None:
+        return failure_response("Missing required field: constellation_id", 400)
+
+    # Validate user exists
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found!", 404)
+
+    # Validate constellation exists
+    constellation = Constellation.query.filter_by(id=constellation_id).first()
+    if constellation is None:
+        return failure_response("Constellation not found!", 404)
+
+    new_attempt = Constellation_Attempt(user_id=user_id, constellation_id=constellation_id)
+    db.session.add(new_attempt)
+    db.session.commit()
+    return success_response(new_attempt.serialize(), 201)
+
+@app.route("/api/constellation_attempts/")
+def get_all_constellation_attempts():
+    """
+    Endpoint for getting all constellation attempts
+    """
+    attempts = [attempt.serialize() for attempt in Constellation_Attempt.query.all()]
+    return success_response({"constellation_attempts": attempts}, 200)
+
+@app.route("/api/constellation_attempts/<int:attempt_id>/")
+def get_constellation_attempt_by_id(attempt_id):
+    """
+    Endpoint for getting a constellation attempt by id
+    """
+    attempt = Constellation_Attempt.query.filter_by(id=attempt_id).first()
+    if attempt is None:
+        return failure_response("Constellation Attempt not found!", 404)
+    return success_response(attempt.serialize(), 200)
+
+@app.route("/api/users/<int:user_id>/constellation_attempts/")
+def get_user_constellation_attempts(user_id):
+    """
+    Endpoint for getting all constellation attempts for a specific user
+    """
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found!", 404)
+    attempts = [attempt.serialize() for attempt in user.constellation_attempts]
+    return success_response({"constellation_attempts": attempts}, 200)
+
 @app.route("/api/constellation_attempts/<int:attempt_id>/", methods = ["PUT"])
 def increment_attempt(attempt_id):
     """
@@ -110,15 +248,33 @@ def delete_attempt(attempt_id):
 
 #------SESSIONS ROUTES-----------------------------------------------------------------------
 @app.route("/api/sessions/", methods = ["POST"])
-def create_post():
+def create_session():
     """
     Endpoint for creating a session
     """
     body = json.loads(request.data)
+    user_id = body.get("user_id")
     constellation_attempt_id = body.get("constellation_attempt_id")
-    if constellation_attempt_id is None:
-        return failure_response("Constellation_attempt_id is missing", 400)
-    new_session = Session(constellation_attempt_id = constellation_attempt_id)
+    hours = body.get("hours")
+
+    if user_id is None or constellation_attempt_id is None or hours is None:
+        return failure_response("Missing user_id, constellation_attempt_id, or hours!", 400)
+
+    # Validate user exists
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found!", 404)
+
+    # Validate constellation attempt exists
+    attempt = Constellation_Attempt.query.filter_by(id=constellation_attempt_id).first()
+    if attempt is None:
+        return failure_response("Constellation Attempt not found!", 404)
+
+    new_session = Session(
+        user_id=user_id,
+        constellation_attempt_id=constellation_attempt_id,
+        hours=hours
+    )
     db.session.add(new_session)
     db.session.commit()
     return success_response(new_session.serialize(), 201)

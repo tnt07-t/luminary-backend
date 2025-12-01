@@ -14,6 +14,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     display_name = db.Column(db.String, nullable = False)
     current_attempt_id = db.Column(db.Integer, db.ForeignKey("constellation_attempts.id"), nullable=True)
+    total_hours = db.Column(db.Integer, nullable=False, default=0)
     #est. relationships
     constellation_attempts = db.relationship("Constellation_Attempt", foreign_keys="Constellation_Attempt.user_id", back_populates = "user", cascade = "delete")
     current_attempt = db.relationship("Constellation_Attempt", foreign_keys=[current_attempt_id], uselist=False)
@@ -25,6 +26,13 @@ class User(db.Model):
         Initialize Course object
         """
         self.display_name = kwargs.get("display_name")
+        self.total_hours = 0
+
+    def calculate_total_hours(self):
+        """
+        Calculate total hours by summing hours from completed sessions only
+        """
+        return sum(session.hours for session in self.sessions if session.is_completed)
 
     def serialize(self):
         """
@@ -34,6 +42,7 @@ class User(db.Model):
             "id": self.id,
             "display_name": self.display_name,
             "current_attempt_id": self.current_attempt_id,
+            "total_hours": self.calculate_total_hours(),
             "current_attempt": self.current_attempt.simple_serialize() if self.current_attempt else None,
             "constellation_attempts": [attempt.simple_serialize() for attempt in self.constellation_attempts],
             "sessions": [session.simple_serialize() for session in self.sessions],
