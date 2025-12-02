@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import event
 
 db = SQLAlchemy()
 
@@ -14,7 +15,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     display_name = db.Column(db.String, nullable = False)
     current_attempt_id = db.Column(db.Integer, db.ForeignKey("constellation_attempts.id"), nullable=True)
-    total_hours = db.Column(db.Integer, nullable=False, default=0)
+    total_minutes = db.Column(db.Integer, nullable=False, default=0)
     #est. relationships
     constellation_attempts = db.relationship("Constellation_Attempt", foreign_keys="Constellation_Attempt.user_id", back_populates = "user", cascade = "delete")
     current_attempt = db.relationship("Constellation_Attempt", foreign_keys=[current_attempt_id], uselist=False)
@@ -26,14 +27,21 @@ class User(db.Model):
         Initialize Course object
         """
         self.display_name = kwargs.get("display_name")
-        self.total_hours = 0
+        self.total_minutes = 0
 
-    def calculate_total_hours(self):
+    def calculate_total_minutes(self):
         """
-        Calculate total hours by summing hours from completed sessions only
+        Calculate total minutes by summing minutes from completed sessions only
         """
-        return sum(session.hours for session in self.sessions if session.is_completed)
-
+        return sum(session.minutes for session in self.sessions if session.is_completed)
+    
+    def update_total_minutes(self):
+        """
+        Update the stored total_minutes field with calculated value
+        """
+        self.total_minutes = self.calculate_total_minutes()
+        db.session.commit()
+        
     def serialize(self):
         """
         Serialize a User Object with all relationships
@@ -42,7 +50,7 @@ class User(db.Model):
             "id": self.id,
             "display_name": self.display_name,
             "current_attempt_id": self.current_attempt_id,
-            "total_hours": self.calculate_total_hours(),
+            "total_minutes": self.calculate_total_minutes(),
             "current_attempt": self.current_attempt.simple_serialize() if self.current_attempt else None,
             "constellation_attempts": [attempt.simple_serialize() for attempt in self.constellation_attempts],
             "sessions": [session.simple_serialize() for session in self.sessions],
@@ -101,8 +109,6 @@ class Constellation(db.Model):
             "weight": self.weight
         }
 
-
-
 class Constellation_Attempt(db.Model):
     """
     Constellation_Attempt model
@@ -151,7 +157,6 @@ class Constellation_Attempt(db.Model):
             "stars_completed": self.stars_completed
         }
     
-
 class Session(db.Model):
     """
     Session model
@@ -249,3 +254,51 @@ class Post(db.Model):
             "post_type": self.post_type,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
+
+
+# Event listeners to automatically update User.total_minutes when sessions change
+
+@event.listens_for(Session, 'after_update')
+def update_user_minutes_after_session_update(mapper, connection, target):
+    """Update user's total_minutes when a session is updated"""
+    if target.user:
+        # Use raw SQL to avoid session conflicts during event handling
+        new_total = connection.execute(
+            "SELECT COALESCE(SUM(minutes), 0) FROM session WHERE user_id = ? AND is_completed = 1",
+            (target.user_id,)
+        ).scalar()
+        
+        connection.execute(
+            "UPDATE user SET total_minutes = ? WHERE id = ?",
+            (new_total, target.user_id)
+        )
+
+@event.listens_for(Session, 'after_insert')
+def update_user_minutes_after_session_insert(mapper, connection, target):
+    """Update user's total_minutes when a new completed session is added"""
+    if target.user and target.is_completed:
+        # Use raw SQL to avoid session conflicts during event handling
+        new_total = connection.execute(
+            "SELECT COALESCE(SUM(minutes), 0) FROM session WHERE user_id = ? AND is_completed = 1",
+            (target.user_id,)
+        ).scalar()
+        
+        connection.execute(
+            "UPDATE user SET total_minutes = ? WHERE id = ?",
+            (new_total, target.user_id)
+        )
+
+@event.listens_for(Session, 'after_delete')
+def update_user_minutes_after_session_delete(mapper, connection, target):
+    """Update user's total_minutes when a session is deleted"""
+    if target.user_id:
+        # Use raw SQL to avoid session conflicts during event handling
+        new_total = connection.execute(
+            "SELECT COALESCE(SUM(minutes), 0) FROM session WHERE user_id = ? AND is_completed = 1",
+            (target.user_id,)
+        ).scalar()
+        
+        connection.execute(
+            "UPDATE user SET total_minutes = ? WHERE id = ?",
+            (new_total, target.user_id)
+        )

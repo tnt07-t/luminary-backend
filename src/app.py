@@ -425,6 +425,23 @@ def get_feed():
     posts = [post.serialize() for post in Post.query.order_by(Post.created_at.desc()).all()]
     return success_response({"posts": posts}, 200)
 
+# ---- UTILITY ROUTES ----
+
+@app.route("/api/users/sync-minutes/", methods=["POST"])
+def sync_all_user_minutes():
+    """
+    Utility endpoint to recalculate and sync all users' total_minutes
+    Useful for data migration or fixing inconsistencies
+    """
+    try:
+        users = User.query.all()
+        for user in users:
+            user.update_total_minutes()
+        
+        return success_response({"message": f"Updated total_minutes for {len(users)} users"}, 200)
+    except Exception as e:
+        return failure_response(f"Error syncing user minutes: {str(e)}")
+
 #------TESTING ROUTE - IGNORE -----------------------------------------------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
