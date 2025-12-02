@@ -58,24 +58,24 @@ def get_user_by_id(user_id):
         return failure_response("User not found!", 404)
     return success_response(user.serialize(), 200)
 
-@app.route("/api/users/<int:user_id>/total_hours/")
-def get_user_total_hours(user_id):
+@app.route("/api/users/<int:user_id>/total_minutes/")
+def get_user_total_minutes(user_id):
     """
-    Endpoint for getting total hours a user has worked (only completed sessions)
+    Endpoint for getting total minutes a user has worked (only completed sessions)
     """
     user = User.query.filter_by(id = user_id).first()
     if user is None:
         return failure_response("User not found!", 404)
 
-    total_hours = 0
+    total_minutes = 0
     for session in user.sessions:
-        if session.is_completed and session.hours:
-            total_hours += session.hours
+        if session.is_completed and session.minutes:
+            total_minutes += session.minutes
 
     return success_response({
         "user_id": user_id,
         "display_name": user.display_name,
-        "total_hours": total_hours
+        "total_minutes": total_minutes
     }, 200)
 
 
@@ -255,10 +255,10 @@ def create_session():
     body = json.loads(request.data)
     user_id = body.get("user_id")
     constellation_attempt_id = body.get("constellation_attempt_id")
-    hours = body.get("hours")
+    minutes = body.get("minutes")
 
-    if user_id is None or constellation_attempt_id is None or hours is None:
-        return failure_response("Missing user_id, constellation_attempt_id, or hours!", 400)
+    if user_id is None or constellation_attempt_id is None or minutes is None:
+        return failure_response("Missing user_id, constellation_attempt_id, or minutes!", 400)
 
     # Validate user exists
     user = User.query.filter_by(id=user_id).first()
@@ -273,7 +273,7 @@ def create_session():
     new_session = Session(
         user_id=user_id,
         constellation_attempt_id=constellation_attempt_id,
-        hours=hours
+        minutes=minutes
     )
     db.session.add(new_session)
     db.session.commit()
@@ -425,22 +425,7 @@ def get_feed():
     posts = [post.serialize() for post in Post.query.order_by(Post.created_at.desc()).all()]
     return success_response({"posts": posts}, 200)
 
-# ---- UTILITY ROUTES ----
 
-@app.route("/api/users/sync-minutes/", methods=["POST"])
-def sync_all_user_minutes():
-    """
-    Utility endpoint to recalculate and sync all users' total_minutes
-    Useful for data migration or fixing inconsistencies
-    """
-    try:
-        users = User.query.all()
-        for user in users:
-            user.update_total_minutes()
-        
-        return success_response({"message": f"Updated total_minutes for {len(users)} users"}, 200)
-    except Exception as e:
-        return failure_response(f"Error syncing user minutes: {str(e)}")
 
 #------TESTING ROUTE - IGNORE -----------------------------------------------------------------------
 if __name__ == "__main__":

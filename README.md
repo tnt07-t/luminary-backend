@@ -6,10 +6,17 @@ Backend API for a study application built with Python, Flask, and SQLAlchemy. Th
 ## Database Schema
 
 - **Users**: Manage user profiles and current study attempts
-- **Constellations**: Study topics with difficulty weights
+- **Constellations**: Study topics with difficulty weights  
 - **Constellation_Attempts**: User progress on specific constellations
 - **Sessions**: Individual study sessions with time tracking
 - **Posts**: Social posts linked to users and constellations
+
+## Key Features
+
+- **Automatic Minute Tracking**: User total minutes are automatically updated when sessions are completed, modified, or deleted
+- **Session Management**: Track individual study sessions with completion status
+- **Progress Tracking**: Monitor constellation completion with star-based progress
+- **Social Feed**: Share achievements and progress with completion/progress posts
 
 
 ## API Overview
@@ -22,7 +29,7 @@ For detailed API documentation with complete request/response examples, see: **[
 - `POST /api/users/` - Create a new user
 - `GET /api/users/` - Get all users  
 - `GET /api/users/{user_id}/` - Get user by ID
-- `GET /api/users/{user_id}/total_hours/` - Get user's total study hours
+- `GET /api/users/{user_id}/total_minutes/` - Get user's total study minutes
 
 #### Constellation Management  
 - `POST /api/constellations/` - Create a constellation
@@ -56,6 +63,9 @@ For detailed API documentation with complete request/response examples, see: **[
 - `GET /constellations/{id}/posts/` - Get constellation's posts
 - `DELETE /api/posts/{id}/` - Delete post
 - `GET /api/feed/` - Get chronological feed of all posts
+
+#### Utility Features
+- `POST /api/users/sync-minutes/` - Recalculate all users' total minutes
 
 
 

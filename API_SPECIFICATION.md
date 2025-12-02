@@ -109,15 +109,15 @@ Complete API documentation with request/response examples for the Luminary Backe
 }
 ```
 
-### Get User Total Hours
-**GET** `/api/users/1/total_hours/`
+### Get User Total Minutes
+**GET** `/api/users/1/total_minutes/`
 
 **Response (200):**
 ```json
 {
     "user_id": 1,
     "display_name": "John Doe",
-    "total_hours": 3
+    "total_minutes": 180
 }
 ```
 
@@ -795,8 +795,10 @@ All error responses follow this format:
 - All timestamps are in ISO 8601 format
 - All IDs are integers starting from 1
 - Minutes are tracked as integers
+- **Automatic Minute Calculation**: User `total_minutes` are automatically updated when sessions change (completed, modified, or deleted)
 - Post types:
   - `"completion"` - when a constellation is fully completed
   - `"progress"` - when a session/star is completed
 - Sessions default to `is_completed: false` when created
 - Constellation attempts start with `stars_completed: 0`
+- The `total_minutes` field in user responses reflects real-time calculations from completed sessions
