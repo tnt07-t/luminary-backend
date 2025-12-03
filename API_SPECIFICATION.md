@@ -123,6 +123,64 @@ Complete API documentation with request/response examples for the Luminary Backe
 }
 ```
 
+### Get User Completed Constellations
+**GET** `/api/users/1/completed_constellations/`
+
+**Response (200):**
+```json
+{
+    "user_id": 1,
+    "display_name": "John Doe",
+    "completed_constellations": [
+        {
+            "id": 1,
+            "name": "Triangulum",
+            "weight": 3,
+            "user_attempts": [
+                {
+                    "id": 1,
+                    "user_id": 1,
+                    "constellation_id": 1,
+                    "stars_completed": 3
+                }
+            ],
+            "posts": [
+                {
+                    "id": 1,
+                    "post_type": "completion",
+                    "message": "Just completed Triangulum! Great start! 🌟",
+                    "study_duration": 30,
+                    "created_at": "2025-12-02T10:15:00"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Delphinus",
+            "weight": 5,
+            "user_attempts": [
+                {
+                    "id": 2,
+                    "user_id": 1,
+                    "constellation_id": 2,
+                    "stars_completed": 5
+                }
+            ],
+            "posts": [
+                {
+                    "id": 3,
+                    "post_type": "completion",
+                    "message": "Delphinus conquered! Moving up in difficulty! 🐬",
+                    "study_duration": 75,
+                    "created_at": "2025-12-02T14:30:00"
+                }
+            ]
+        }
+    ],
+    "num_completed": 2
+}
+```
+
 ## Constellation Routes
 
 ### Create Constellation

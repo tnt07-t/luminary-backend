@@ -96,6 +96,28 @@ def get_user_total_minutes(user_id):
         "total_minutes": total_minutes
     }, 200)
 
+@app.route("/api/users/<int:user_id>/completed_constellations/")
+def get_user_completed_constellations(user_id):
+    """
+    Endpoint for getting all constellations that a user has completed
+    """
+    user = User.query.filter_by(id=user_id).first()
+    if user is None:
+        return failure_response("User not found!", 404)
+
+    completed_constellations = []
+    for attempt in user.constellation_attempts:
+        # Check if the attempt is completed (stars_completed equals constellation weight)
+        if attempt.stars_completed == attempt.constellation.weight:
+            completed_constellations.append(attempt.constellation.serialize())
+
+    return success_response({
+        "user_id": user_id,
+        "display_name": user.display_name,
+        "completed_constellations": completed_constellations,
+        "num_completed": len(completed_constellations)
+    }, 200)
+
 
 #------CONSTELLATION ROUTES-------------------------------------------------------------
 @app.route("/api/constellations/", methods=["POST"])

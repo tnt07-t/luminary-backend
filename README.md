@@ -30,6 +30,7 @@ For detailed API documentation with complete request/response examples, see: **[
 - `GET /api/users/` - Get all users  
 - `GET /api/users/{user_id}/` - Get user by ID
 - `GET /api/users/{user_id}/total_minutes/` - Get user's total study minutes
+- `GET /api/users/{user_id}/completed_constellations/` - Get user's completed constellations
 
 #### Constellation Management  
 - `POST /api/constellations/` - Create a constellation
