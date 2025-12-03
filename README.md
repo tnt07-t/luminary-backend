@@ -9,7 +9,7 @@ Backend API for a study application built with Python, Flask, and SQLAlchemy. Th
 - **Constellations**: Study topics with difficulty weights  
 - **Constellation_Attempts**: User progress on specific constellations
 - **Sessions**: Individual study sessions with time tracking
-- **Posts**: Social posts linked to users and constellations
+- **Posts**: Social posts with optional messages and study duration tracking
 
 ## Key Features
 

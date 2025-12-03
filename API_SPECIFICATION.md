@@ -65,6 +65,8 @@ Complete API documentation with request/response examples for the Luminary Backe
                 {
                     "id": 1,
                     "post_type": "completion",
+                    "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+                    "study_duration": 45,
                     "created_at": "2025-12-01T10:30:00"
                 }
             ]
@@ -168,6 +170,8 @@ Complete API documentation with request/response examples for the Luminary Backe
                 {
                     "id": 1,
                     "post_type": "completion",
+                    "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+                    "study_duration": 45,
                     "created_at": "2025-12-01T10:30:00"
                 }
             ]
@@ -587,13 +591,18 @@ Complete API documentation with request/response examples for the Luminary Backe
 {
     "user_id": 1,
     "constellation_id": 1,
-    "post_type": "completion"
+    "post_type": "completion",
+    "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+    "study_duration": 45
 }
 ```
 
-**Note:** `post_type` must be either:
-- `"completion"` - when a constellation is fully completed
-- `"progress"` - when a session/star is completed
+**Note:** 
+- `post_type` must be either:
+  - `"completion"` - when a constellation is fully completed
+  - `"progress"` - when a session/star is completed
+- `message` (optional): Text message for the post
+- `study_duration` (optional): Study time in minutes
 
 **Response (201):**
 ```json
@@ -602,6 +611,8 @@ Complete API documentation with request/response examples for the Luminary Backe
     "user_id": 1,
     "constellation_id": 1,
     "post_type": "completion",
+    "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+    "study_duration": 45,
     "created_at": "2025-12-01T10:30:00",
     "user": {
         "id": 1,
@@ -627,6 +638,8 @@ Complete API documentation with request/response examples for the Luminary Backe
             "user_id": 1,
             "constellation_id": 1,
             "post_type": "completion",
+            "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+            "study_duration": 45,
             "created_at": "2025-12-01T10:30:00",
             "user": {
                 "id": 1,
@@ -652,6 +665,8 @@ Complete API documentation with request/response examples for the Luminary Backe
     "user_id": 1,
     "constellation_id": 1,
     "post_type": "completion",
+    "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+    "study_duration": 45,
     "created_at": "2025-12-01T10:30:00",
     "user": {
         "id": 1,
@@ -677,6 +692,8 @@ Complete API documentation with request/response examples for the Luminary Backe
             "user_id": 1,
             "constellation_id": 1,
             "post_type": "completion",
+            "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+            "study_duration": 45,
             "created_at": "2025-12-01T10:30:00",
             "user": {
                 "id": 1,
@@ -704,6 +721,8 @@ Complete API documentation with request/response examples for the Luminary Backe
             "user_id": 1,
             "constellation_id": 1,
             "post_type": "completion",
+            "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+            "study_duration": 45,
             "created_at": "2025-12-01T10:30:00",
             "user": {
                 "id": 1,
@@ -741,6 +760,8 @@ Complete API documentation with request/response examples for the Luminary Backe
             "user_id": 1,
             "constellation_id": 1,
             "post_type": "progress",
+            "message": "Made great progress on Cassiopeia today! 3 stars completed ⭐",
+            "study_duration": 30,
             "created_at": "2025-12-01T14:22:00",
             "user": {
                 "id": 1,
@@ -757,6 +778,8 @@ Complete API documentation with request/response examples for the Luminary Backe
             "user_id": 1,
             "constellation_id": 1,
             "post_type": "completion",
+            "message": "Just completed Cassiopeia! Amazing learning experience 🌟",
+            "study_duration": 45,
             "created_at": "2025-12-01T10:30:00",
             "user": {
                 "id": 1,
@@ -799,6 +822,9 @@ All error responses follow this format:
 - Post types:
   - `"completion"` - when a constellation is fully completed
   - `"progress"` - when a session/star is completed
+- Post fields:
+  - `message` (optional): Custom text message for the post
+  - `study_duration` (optional): Study time in minutes for this session
 - Sessions default to `is_completed: false` when created
 - Constellation attempts start with `stars_completed: 0`
 - The `total_minutes` field in user responses reflects real-time calculations from completed sessions
