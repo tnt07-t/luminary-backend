@@ -15,6 +15,24 @@ app.config["SQLALCHEMY_ECHO"] = True
 db.init_app(app)
 with app.app_context():
     db.create_all()
+    
+    # Prepopulate constellations if they don't exist
+    if Constellation.query.count() == 0:
+        constellations_data = [
+            {"name": "Triangulum", "weight": 3},
+            {"name": "Delphinus", "weight": 5},
+            {"name": "Big Dipper", "weight": 7}
+        ]
+        
+        for constellation_info in constellations_data:
+            new_constellation = Constellation(
+                name=constellation_info["name"],
+                weight=constellation_info["weight"]
+            )
+            db.session.add(new_constellation)
+        
+        db.session.commit()
+        print("Prepopulated constellations: Triangulum (3 stars), Delphinus (5 stars), Big Dipper (7 stars)")
 
 # generalized response formats
 def success_response(data, code=200):
@@ -353,10 +371,19 @@ def create_post():
     user_id = body.get("user_id")
     constellation_id = body.get("constellation_id")
     post_type = body.get("post_type")
+    message = body.get("message")
+    study_duration = body.get("study_duration")
+    
     if user_id is None or constellation_id is None or post_type is None:
         return failure_response("Missing required fields", 400)
-    new_post = Post(user_id = user_id, constellation_id = constellation_id, post_type
-                    = post_type)
+    
+    new_post = Post(
+        user_id=user_id, 
+        constellation_id=constellation_id, 
+        post_type=post_type,
+        message=message,
+        study_duration=study_duration
+    )
     db.session.add(new_post)
     db.session.commit()
     return success_response(new_post.serialize(), 201)

@@ -217,6 +217,8 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     constellation_id = db.Column(db.Integer, db.ForeignKey('constellations.id'), nullable=False)
     post_type = db.Column(db.String(50), nullable=False)
+    message = db.Column(db.Text, nullable=True)
+    study_duration = db.Column(db.Integer, nullable=True)  # in minutes
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     #establish relationships
@@ -230,6 +232,8 @@ class Post(db.Model):
         self.user_id = kwargs.get('user_id')
         self.constellation_id = kwargs.get('constellation_id')
         self.post_type = kwargs.get('post_type')
+        self.message = kwargs.get('message')
+        self.study_duration = kwargs.get('study_duration')
 
     def serialize(self):
         """
@@ -240,6 +244,8 @@ class Post(db.Model):
             "user_id": self.user_id,
             "constellation_id": self.constellation_id,
             "post_type": self.post_type,
+            "message": self.message,
+            "study_duration": self.study_duration,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "user": self.user.simple_serialize() if self.user else None,
             "constellation": self.constellation.simple_serialize() if self.constellation else None
@@ -252,6 +258,8 @@ class Post(db.Model):
         return {
             "id": self.id,
             "post_type": self.post_type,
+            "message": self.message,
+            "study_duration": self.study_duration,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
