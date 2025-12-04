@@ -1,5 +1,9 @@
 # Luminary Backend
 
+**Tagline:** Track your learning journey through the stars
+
+**Related Repository:** [Frontend Repository](https://github.com/typazo/luminary-frontend)
+
 Backend API for a study application built with Python, Flask, and SQLAlchemy. This application helps users track their learning progress through constellations (study topics), attempts, sessions, and posts them after completing every constellation.
 
 
@@ -68,8 +72,40 @@ For detailed API documentation with complete request/response examples, see: **[
 #### Utility Features
 - `POST /api/users/sync-minutes/` - Recalculate all users' total minutes
 
+## Requirements Fulfillment
 
+This backend API meets all the specified requirements:
 
+###  **At least 4 routes (1 GET, 1 POST, 1 DELETE)**
+- **GET Routes**: `/api/users/`, `/api/constellations/`, `/api/sessions/`, `/api/posts/`, `/api/feed/`
+- **POST Routes**: `/api/users/`, `/api/constellations/`, `/api/sessions/`, `/api/posts/`
+- **DELETE Routes**: `/api/constellations/{id}/`, `/api/constellation_attempts/{id}/`, `/api/posts/{id}/`
+- **PUT Routes**: Updates and completions
+
+### **At least 2 tables with relationships**
+We have **5 interconnected tables**:
+- **Users** ↔ **Constellation_Attempts** (One-to-Many)
+- **Users** ↔ **Sessions** (One-to-Many)  
+- **Users** ↔ **Posts** (One-to-Many)
+- **Constellations** ↔ **Constellation_Attempts** (One-to-Many)
+- **Constellations** ↔ **Posts** (One-to-Many)
+- **Constellation_Attempts** ↔ **Sessions** (One-to-Many)
+
+### **API Specification**
+Complete API documentation available in **[API_SPECIFICATION.md](./API_SPECIFICATION.md)** with:
+- Detailed request/response examples for all 25+ endpoints
+- Error handling documentation
+- Field descriptions and validation rules
+- Real-world usage examples
+
+## Deployment
+
+The application is containerized with Docker and can be deployed using:
+```bash
+docker-compose up -d
+```
+
+See `docker-compose.yml` for deployment configuration.
 
 ---
 Created by Olric Zeng and Tran Tran
