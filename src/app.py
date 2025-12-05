@@ -383,7 +383,7 @@ def complete_session(session_id):
     session = Session.query.filter_by(id=session_id).first()
     if session is None:
         return failure_response("Session not found!", 404)
-    session.completed = True
+    session.is_completed = True
     db.session.commit()
     return success_response(session.serialize(), 200)
 
