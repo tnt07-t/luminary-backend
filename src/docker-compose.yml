@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   luminary-backend:
-    image: olriczeng/luminary-backend:v1.0.0
+    image: olriczeng/luminary-backend:v1.0.3
     container_name: luminary-backend
     ports:
-      - "8000:8000"
+      - "80:8000"
     environment:
       - FLASK_ENV=production
       - FLASK_APP=src/app.py
