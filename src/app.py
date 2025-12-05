@@ -66,6 +66,18 @@ def get_users():
     users = [user.serialize() for user in User.query.all()]
     return success_response({"users": users}, 200)
 
+@app.route("/api/users/<int:user_id>/current-attempt/")
+def get_user_current_attempt(user_id):
+    """
+    Get user's current constellation attempt
+    """
+    user = User.query.filter_by(id = user_id).first()
+    if user is None:
+        return failure_response("User not found!", 404)
+    if user.current_attempt is None:
+        return failure_response("No current attempt found!", 404)
+    return success_response(user.current_attempt.serialize(),200)
+
 @app.route("/api/users/<int:user_id>/")
 def get_user_by_id(user_id):
     """
@@ -207,6 +219,11 @@ def create_constellation_attempt(user_id):
 
     new_attempt = Constellation_Attempt(user_id=user_id, constellation_id=constellation_id)
     db.session.add(new_attempt)
+    db.session.flush()  # Flush to get the new_attempt.id
+
+    # Set this as the user's current attempt
+    user.current_attempt_id = new_attempt.id
+
     db.session.commit()
     return success_response(new_attempt.serialize(), 201)
 
