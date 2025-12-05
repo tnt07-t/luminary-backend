@@ -614,7 +614,7 @@ Complete API documentation with request/response examples for the Luminary Backe
 ```
 
 ### Complete Session
-**PUT** `/api/sessions/1/complete`
+**PUT** `/api/sessions/1/complete/`
 
 **Response (200):**
 ```json
@@ -638,7 +638,7 @@ Complete API documentation with request/response examples for the Luminary Backe
 ```
 
 ### Cancel Session
-**PUT** `/api/sessions/1/cancel`
+**PUT** `/api/sessions/1/cancel/`
 
 **Response (200):**
 ```json
