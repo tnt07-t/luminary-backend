@@ -269,30 +269,30 @@ class Post(db.Model):
 @event.listens_for(Session, 'after_update')
 def update_user_minutes_after_session_update(mapper, connection, target):
     """Update user's total_minutes when a session is updated"""
-    if target.user:
+    if target.user_id:
         # Use raw SQL to avoid session conflicts during event handling
         new_total = connection.execute(
-            "SELECT COALESCE(SUM(minutes), 0) FROM session WHERE user_id = ? AND is_completed = 1",
+            "SELECT COALESCE(SUM(minutes), 0) FROM sessions WHERE user_id = ? AND is_completed = 1",
             (target.user_id,)
         ).scalar()
-        
+
         connection.execute(
-            "UPDATE user SET total_minutes = ? WHERE id = ?",
+            "UPDATE users SET total_minutes = ? WHERE id = ?",
             (new_total, target.user_id)
         )
 
 @event.listens_for(Session, 'after_insert')
 def update_user_minutes_after_session_insert(mapper, connection, target):
     """Update user's total_minutes when a new completed session is added"""
-    if target.user and target.is_completed:
+    if target.user_id and target.is_completed:
         # Use raw SQL to avoid session conflicts during event handling
         new_total = connection.execute(
-            "SELECT COALESCE(SUM(minutes), 0) FROM session WHERE user_id = ? AND is_completed = 1",
+            "SELECT COALESCE(SUM(minutes), 0) FROM sessions WHERE user_id = ? AND is_completed = 1",
             (target.user_id,)
         ).scalar()
-        
+
         connection.execute(
-            "UPDATE user SET total_minutes = ? WHERE id = ?",
+            "UPDATE users SET total_minutes = ? WHERE id = ?",
             (new_total, target.user_id)
         )
 
@@ -302,11 +302,11 @@ def update_user_minutes_after_session_delete(mapper, connection, target):
     if target.user_id:
         # Use raw SQL to avoid session conflicts during event handling
         new_total = connection.execute(
-            "SELECT COALESCE(SUM(minutes), 0) FROM session WHERE user_id = ? AND is_completed = 1",
+            "SELECT COALESCE(SUM(minutes), 0) FROM sessions WHERE user_id = ? AND is_completed = 1",
             (target.user_id,)
         ).scalar()
-        
+
         connection.execute(
-            "UPDATE user SET total_minutes = ? WHERE id = ?",
+            "UPDATE users SET total_minutes = ? WHERE id = ?",
             (new_total, target.user_id)
         )

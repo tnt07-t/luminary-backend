@@ -375,7 +375,7 @@ def get_sessions_by_attempt(attempt_id):
     sessions = [session.serialize() for session in attempt.sessions]
     return success_response({"sessions": sessions}, 200)
 
-@app.route("/api/sessions/<int:session_id>/complete", methods=["PUT"])
+@app.route("/api/sessions/<int:session_id>/complete/", methods=["PUT"])
 def complete_session(session_id):
     """
     Endpoint for completing a session
@@ -387,7 +387,7 @@ def complete_session(session_id):
     db.session.commit()
     return success_response(session.serialize(), 200)
 
-@app.route("/api/sessions/<int:session_id>/cancel", methods=["PUT"])
+@app.route("/api/sessions/<int:session_id>/cancel/", methods=["PUT"])
 def cancel_session(session_id):
     """
     Endpoint for canceling a session
