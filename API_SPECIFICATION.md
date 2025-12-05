@@ -180,6 +180,28 @@ Complete API documentation with request/response examples for the Luminary Backe
     "num_completed": 2
 }
 ```
+### Get User Current Constellation Attempt
+**GET** `/api/users/1/current-attempt/`
+```json
+    {
+    
+    "id": 3,
+    "user_id": 1,
+    "constellation_id": 2,
+    "stars_completed": 0,
+    "user": {
+        "id": 1,
+        "display_name": "kaylee"
+    },
+    "constellation": {
+        "id": 2,
+        "name": "Delphinus",
+        "weight": 5
+    },
+    "sessions": []
+}
+```
+
 
 ## Constellation Routes
 
