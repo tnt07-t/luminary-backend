@@ -488,7 +488,7 @@ def get_feed():
     """
     Endpoint for getting the feed of all posts
     """
-    posts = [post.serialize() for post in Post.query.order_by(Post.created_at.desc()).all()]
+    posts = [post.serialize() for post in Post.query.order_by(Post.id.desc()).all()]
     return success_response({"posts": posts}, 200)
 
 
