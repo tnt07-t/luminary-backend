@@ -1,8 +1,10 @@
 # Luminary Backend
 
-**Tagline:** Track your learning journey through the stars
+**Tagline:** Track your learning journey through the stars!
 
 **Related Repository:** [Frontend Repository](https://github.com/typazo/luminary-frontend)
+
+**Recognition:** Ranked *Best Overall* in the 2025 Hack Challenge.
 
 Backend API for a study application built with Python, Flask, and SQLAlchemy. This application helps users track their learning progress through constellations (study topics), attempts, sessions, and posts them after completing every constellation.
 
@@ -21,6 +23,22 @@ Backend API for a study application built with Python, Flask, and SQLAlchemy. Th
 - **Session Management**: Track individual study sessions with completion status
 - **Progress Tracking**: Monitor constellation completion with star-based progress
 - **Social Feed**: Share achievements and progress with completion/progress posts
+
+## Screenshots
+
+<table>
+	<tr>
+		<td align="center">
+			<img src="./images/Feed.png" alt="Feed page" width="260" /><br/>Feed Page
+		</td>
+		<td align="center">
+			<img src="./images/Profile.png" alt="Profile page" width="260" /><br/>Profile Page
+		</td>
+		<td align="center">
+			<img src="./images/Session.png" alt="Session logging page" width="260" /><br/>Session Page
+		</td>
+	</tr>
+</table>
 
 
 ## API Overview
