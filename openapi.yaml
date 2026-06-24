@@ -1,0 +1,867 @@
+openapi: 3.0.3
+info:
+  title: Luminary API
+  description: REST API for the Luminary study tracking app.
+  version: 1.0.0
+
+servers:
+  - url: /api
+
+tags:
+  - name: Users
+  - name: Constellations
+  - name: Constellation Attempts
+  - name: Sessions
+  - name: Posts
+
+paths:
+  /users/:
+    get:
+      tags: [Users]
+      summary: Get all users
+      responses:
+        "200":
+          description: List of all users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserDetail"
+    post:
+      tags: [Users]
+      summary: Create a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [display_name]
+              properties:
+                display_name:
+                  type: string
+                  example: John Doe
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /users/{user_id}/:
+    get:
+      tags: [Users]
+      summary: Get user by ID
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /users/{user_id}/total_minutes/:
+    get:
+      tags: [Users]
+      summary: Get user's total study minutes
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Total minutes for user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                  display_name:
+                    type: string
+                  total_minutes:
+                    type: integer
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /users/{user_id}/completed_constellations/:
+    get:
+      tags: [Users]
+      summary: Get user's completed constellations
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Completed constellations for user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: integer
+                  display_name:
+                    type: string
+                  completed_constellations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ConstellationDetail"
+                  num_completed:
+                    type: integer
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /users/{user_id}/current-attempt/:
+    get:
+      tags: [Users]
+      summary: Get user's current constellation attempt
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Current constellation attempt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstellationAttemptDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /users/{user_id}/constellation_attempts/:
+    get:
+      tags: [Constellation Attempts]
+      summary: Get all constellation attempts for a user
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: List of constellation attempts for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  constellation_attempts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ConstellationAttemptDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Constellation Attempts]
+      summary: Create a constellation attempt for a user
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [constellation_id]
+              properties:
+                constellation_id:
+                  type: integer
+                  example: 1
+      responses:
+        "201":
+          description: Constellation attempt created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstellationAttemptDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /users/{user_id}/posts/:
+    get:
+      tags: [Posts]
+      summary: Get posts by user
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Posts for user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /constellations/:
+    get:
+      tags: [Constellations]
+      summary: Get all constellations
+      responses:
+        "200":
+          description: List of all constellations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  constellations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ConstellationDetail"
+    post:
+      tags: [Constellations]
+      summary: Create a constellation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, weight]
+              properties:
+                name:
+                  type: string
+                  example: Cassiopeia
+                weight:
+                  type: integer
+                  example: 5
+      responses:
+        "201":
+          description: Constellation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstellationDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /constellations/{constellation_id}/:
+    get:
+      tags: [Constellations]
+      summary: Get constellation by ID
+      parameters:
+        - $ref: "#/components/parameters/ConstellationId"
+      responses:
+        "200":
+          description: Constellation found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstellationDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Constellations]
+      summary: Update a constellation
+      parameters:
+        - $ref: "#/components/parameters/ConstellationId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Big Dipper
+                weight:
+                  type: integer
+                  example: 7
+      responses:
+        "200":
+          description: Constellation updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstellationDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Constellations]
+      summary: Delete a constellation
+      parameters:
+        - $ref: "#/components/parameters/ConstellationId"
+      responses:
+        "200":
+          description: Constellation deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /constellations/{constellation_id}/posts/:
+    get:
+      tags: [Posts]
+      summary: Get posts by constellation
+      parameters:
+        - $ref: "#/components/parameters/ConstellationId"
+      responses:
+        "200":
+          description: Posts for constellation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /constellation_attempts/:
+    get:
+      tags: [Constellation Attempts]
+      summary: Get all constellation attempts
+      responses:
+        "200":
+          description: List of all constellation attempts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  constellation_attempts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ConstellationAttemptDetail"
+
+  /constellation_attempts/{attempt_id}/:
+    get:
+      tags: [Constellation Attempts]
+      summary: Get constellation attempt by ID
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      responses:
+        "200":
+          description: Constellation attempt found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstellationAttemptDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags: [Constellation Attempts]
+      summary: Increment attempt progress (stars_completed + 1)
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      responses:
+        "200":
+          description: Attempt progress incremented
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConstellationAttemptDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Constellation Attempts]
+      summary: Delete a constellation attempt
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      responses:
+        "200":
+          description: Constellation attempt deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /constellation_attempts/{attempt_id}/complete:
+    put:
+      tags: [Constellation Attempts]
+      summary: Mark constellation attempt as complete
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      responses:
+        "200":
+          description: Constellation attempt completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempt:
+                    $ref: "#/components/schemas/ConstellationAttemptDetail"
+                  user_updated:
+                    type: boolean
+                  message:
+                    type: string
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /constellation_attempts/{attempt_id}/sessions/:
+    get:
+      tags: [Sessions]
+      summary: Get sessions for a constellation attempt
+      parameters:
+        - $ref: "#/components/parameters/AttemptId"
+      responses:
+        "200":
+          description: Sessions for the attempt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SessionDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /sessions/:
+    get:
+      tags: [Sessions]
+      summary: Get all sessions
+      responses:
+        "200":
+          description: List of all sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SessionDetail"
+    post:
+      tags: [Sessions]
+      summary: Create a session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, constellation_attempt_id, minutes]
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                constellation_attempt_id:
+                  type: integer
+                  example: 2
+                minutes:
+                  type: integer
+                  example: 45
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /sessions/{session_id}/:
+    get:
+      tags: [Sessions]
+      summary: Get session by ID
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /sessions/{session_id}/complete/:
+    put:
+      tags: [Sessions]
+      summary: Mark session as complete
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /sessions/{session_id}/cancel/:
+    put:
+      tags: [Sessions]
+      summary: Cancel a session
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Session cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /posts/:
+    get:
+      tags: [Posts]
+      summary: Get all posts
+      responses:
+        "200":
+          description: List of all posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostDetail"
+    post:
+      tags: [Posts]
+      summary: Create a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, constellation_id, post_type]
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                constellation_id:
+                  type: integer
+                  example: 1
+                post_type:
+                  type: string
+                  enum: [completion, progress]
+                  example: completion
+                message:
+                  type: string
+                  nullable: true
+                  example: "Just completed Cassiopeia! Amazing learning experience"
+                study_duration:
+                  type: integer
+                  nullable: true
+                  example: 45
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /posts/{post_id}/:
+    get:
+      tags: [Posts]
+      summary: Get post by ID
+      parameters:
+        - $ref: "#/components/parameters/PostId"
+      responses:
+        "200":
+          description: Post found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Posts]
+      summary: Delete a post
+      parameters:
+        - $ref: "#/components/parameters/PostId"
+      responses:
+        "200":
+          description: Post deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /feed/:
+    get:
+      tags: [Posts]
+      summary: Get all posts as a feed (newest first)
+      responses:
+        "200":
+          description: Feed of posts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PostDetail"
+
+components:
+  parameters:
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+    ConstellationId:
+      name: constellation_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+    AttemptId:
+      name: attempt_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 2
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+    PostId:
+      name: post_id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: User not found!
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Deleted successfully!
+
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+
+    ConstellationSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        weight:
+          type: integer
+
+    AttemptSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        constellation_id:
+          type: integer
+        stars_completed:
+          type: integer
+
+    SessionSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        constellation_attempt_id:
+          type: integer
+        is_completed:
+          type: boolean
+        minutes:
+          type: integer
+
+    PostSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        post_type:
+          type: string
+          enum: [completion, progress]
+        message:
+          type: string
+          nullable: true
+        study_duration:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    UserDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        display_name:
+          type: string
+        current_attempt_id:
+          type: integer
+          nullable: true
+        current_attempt:
+          nullable: true
+          allOf:
+            - $ref: "#/components/schemas/AttemptSummary"
+        constellation_attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttemptSummary"
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionSummary"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostSummary"
+
+    ConstellationDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        weight:
+          type: integer
+        user_attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttemptSummary"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostSummary"
+
+    ConstellationAttemptDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        constellation_id:
+          type: integer
+        stars_completed:
+          type: integer
+        user:
+          $ref: "#/components/schemas/UserSummary"
+        constellation:
+          $ref: "#/components/schemas/ConstellationSummary"
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionSummary"
+
+    SessionDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        constellation_attempt_id:
+          type: integer
+        is_completed:
+          type: boolean
+        minutes:
+          type: integer
+        user:
+          $ref: "#/components/schemas/UserSummary"
+        constellation_attempt:
+          $ref: "#/components/schemas/AttemptSummary"
+
+    PostDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        constellation_id:
+          type: integer
+        post_type:
+          type: string
+          enum: [completion, progress]
+        message:
+          type: string
+          nullable: true
+        study_duration:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/UserSummary"
+        constellation:
+          $ref: "#/components/schemas/ConstellationSummary"
