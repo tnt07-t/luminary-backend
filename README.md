@@ -4,7 +4,7 @@
 
 **Related Repository:** [Frontend Repository](https://github.com/typazo/luminary-frontend)
 
-**Recognition:** Ranked *Best Overall* in the 2025 Hack Challenge.
+**Recognition:** Won *Best Overall* in the 2025 Hack Challenge.
 
 Backend API for a study application built with Python, Flask, and SQLAlchemy. This application helps users track their learning progress through constellations (study topics), attempts, sessions, and posts them after completing every constellation.
 
